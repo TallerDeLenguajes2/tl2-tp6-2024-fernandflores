@@ -1,0 +1,35 @@
+@model List<Productos>
+         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">            
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 justify-content-center">
+                        <li class="nav-item">
+                            <a class="btn btn-primary" asp-controller="Productos" asp-action="CrearProducto">Crear Producto</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    <h2 class="text-center">LISTADO DE PRODUCTOS</h2>
+    <section>
+        <article>
+            <table class="table table-bordered bordered-info">
+                <thead class="text-center">
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th colspan="2">Acciones</th>
+                </thead>
+                @{
+                    foreach(var item in Model) // envia @item.IdProducto el id a su controlador 
+                    {
+                        <tr>
+                            <td class="text-start">@item.Descripcion</td>
+                            <td class="text-center">@item.Precio</td>
+                            <td class="text-center"><a asp-controller="Productos" asp-action="ModificarProducto" asp-route-id="@item.IdProducto" class="btn btn-secondary">Modificar</a></td> 
+                            <td class="text-center"><a asp-controller="Productos" asp-action="EliminarProducto" asp-route-id="@item.IdProducto" class="btn btn-danger">Eliminar</a></td>
+                        </tr>
+                    }
+                }
+            </table>
+        </article>
+    </section>
