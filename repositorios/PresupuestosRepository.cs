@@ -121,7 +121,7 @@ public class PresupuestosRepository
             command.Parameters.AddWithValue("@id", id);
             using (SqliteDataReader reader = command.ExecuteReader())
             {
-                if (reader.Read())
+                while (reader.Read())
                 {
                     if(idAux != Convert.ToInt32(reader["idPresupuesto"])) //creo solo un objeto presupuesto(si tiene varios detalles la consulta devuelve varios idpresupuestos (iguales) como demostre en el ejemplo de supertabla)
                     {
@@ -137,6 +137,7 @@ public class PresupuestosRepository
         }
         return presupuesto;
     }
+
     public bool AgregarProductoyCantidad(int idPres, int idProd, int cant)
     {  
         ProductoRepository repoProd= new ProductoRepository();
@@ -147,7 +148,7 @@ public class PresupuestosRepository
         {
             connection.Open();
             SqliteCommand command = new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("@idPres",idPres);
+            command.Parameters.AddWithValue("@idPres", idPres);
             command.Parameters.AddWithValue("@idProd", idProd);
             command.Parameters.AddWithValue("@cant", cant);
             command.ExecuteNonQuery();
@@ -175,7 +176,7 @@ public class PresupuestosRepository
             return true;
         }
     }
-    public bool ModificarPresupuesto(int idPres, int idProd, int cant, int idProdNuevo)
+    public bool ModificarDetalle(PresupuestosDetalle detalle, int idPres ,int idProdViejo)
     {
         string query="UPDATE PresupuestosDetalle SET idProducto=@idProdNuevo, Cantidad=@cant WHERE idPresupuesto=@idPres AND idProducto=@idProd";
         string connectionString="Data Source= Tienda.db; Cache= Shared";
@@ -183,13 +184,29 @@ public class PresupuestosRepository
         {
             connection.Open();
             var command= new SqliteCommand(query,connection);
-            command.Parameters.AddWithValue("@idPres",idPres);
-            command.Parameters.AddWithValue("@idProd", idProd);
-            command.Parameters.AddWithValue("@idProdNuevo", idProdNuevo);
-            command.Parameters.AddWithValue("@cant", cant);
+            command.Parameters.AddWithValue("@idPres", idPres);
+            command.Parameters.AddWithValue("@idProd", idProdViejo);
+            command.Parameters.AddWithValue("@idProdNuevo", detalle.Producto.IdProducto);
+            command.Parameters.AddWithValue("@cant", detalle.Cantidad);
             int filas=command.ExecuteNonQuery(); // el executenonquer ejectuta el comando devuelve la cantidad de filas afectadas
             connection.Close();
             return filas>0; //devuelve true si las fila es mayor a 0 (hubo modificacion)
+        }
+    }
+    public bool ModificarPresupuesto(Presupuestos presupuesto, int id)
+    {
+        string query= "UPDATE Presupuestos SET NombreDestinatario= @nombre, FechaCreacion=@fecha WHERE idPresupuesto=@idPres";
+        string connectionString="Data Source= Tienda.db; Cache= Shared";
+        using (var connection= new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var command= new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("@idPres", id);
+            command.Parameters.AddWithValue("@nombre", presupuesto.NombreDestinatario);
+            command.Parameters.AddWithValue("@fecha", presupuesto.FechaCreacion);
+            int filas= command.ExecuteNonQuery();
+            connection.Close();
+            return filas>0;
         }
     }
 }

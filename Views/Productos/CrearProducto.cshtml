@@ -1,4 +1,4 @@
-@model Productos // formulario al que envia la view de CrearProducto
+@model Productos 
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-asp-controller="Productos" asp-action="CrearProducto" method="post">
@@ -15,6 +15,6 @@
                 <a class="btn btn-danger " asp-controller="Productos" asp-action="Index" >volver</a>
             </section>
         </form>
-        
+        @*// asp-for conecta los modelos con el formulario, es decir que automaticamente se crea el objeto*@
     </article>
 </section>

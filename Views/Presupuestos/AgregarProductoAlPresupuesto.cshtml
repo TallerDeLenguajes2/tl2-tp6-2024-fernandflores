@@ -1,0 +1,22 @@
+@model int 
+
+<section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <article class="border rounded p-5">
+        <form asp-asp-controller="Presupuestos" asp-action="AgregarProductoAlPresupuesto" method="post">
+            <input type="hidden"  name="idPres" value="@Model">
+            <section class="form-group d-flex justify-content-between p-2">
+                <label class="form-label">Id producto a agregar</label>
+                <input type="number" name="idProd" class="form-control-sm">
+            </section>
+            <section class="form-group d-flex justify-content-between p-2">
+                <label  class="form-label">cantidad</label>
+                <input type="number" name="cant" class="form-control-sm">
+            </section>
+            <section  class="form-group p-2">
+                <input type="submit" value="crear" class="btn btn-primary">
+                <a class="btn btn-danger " asp-controller="Presupuestos" asp-action="VerDetalle" >volver</a>
+            </section>
+        </form>
+@* input envia al controlador los datos de los parametros a traves del name del imput *@
+    </article>
+</section>

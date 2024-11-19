@@ -1,0 +1,23 @@
+@model PresupuestosDetalle // como recibimos como modelo el objeto presupuesto detalle, envie el idPres por viewData para que lo reciba ModificarDetalle
+<section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <article class="border rounded p-5">
+        <form asp-asp-controller="Presupuestos" asp-action="ModificarDetalle" method="post">
+            <input type="hidden" name="idProdViejo" value="@Model.Producto.IdProducto"> @*mismo caso que abajo, solo que aqui la informacion la tiene el modelo*@
+            <input type="hidden" name="idPres" value="@ViewData["idPres"]"> @*el name "idPres" del input se comunica con el parametro idPres del metodo ModificarDetalle deben ser iguales para que se comuniquen*@
+            <section class="form-group p-2">
+                <label asp-for="Producto.IdProducto" class="form-label">Id Producto Nuevo</label>
+                <input type="text" asp-for="Producto.IdProducto" class="form-control-sm" value="@Model.Producto.IdProducto">
+            </section>
+            <section class="form-group d-flex justify-content-between p-2">
+                <label asp-for="Cantidad" class="form-label">Cantidad</label>
+                <input type="num" asp-for="Cantidad" class="form-control-sm" value="@Model.Cantidad">
+            </section>
+            <section  class="form-group p-2">
+                <input type="submit" value="modificar" class="btn btn-primary">
+                <a class="btn btn-danger " asp-controller="Presupuestos" asp-action="Index" >volver</a>
+            </section>
+        </form>
+        @* asp-for conecta los modelos con el formulario, es decir que automaticamente se crea el objeto, como el objeto no tiene un idprodviejo y idpres, se los envio trabajando con viewData para recibir en este archivo esos valores y con el name del input para mandar esos valores a ModificarDetalle*@
+        
+    </article>
+</section>

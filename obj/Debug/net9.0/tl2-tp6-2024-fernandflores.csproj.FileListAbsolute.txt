@@ -122,3 +122,4 @@ C:\Users\chinn\Documents\TALLER_DE_LENGUAJES_II\tl2-tp6-2024-fernandflores\bin\D
 C:\Users\chinn\Documents\TALLER_DE_LENGUAJES_II\tl2-tp6-2024-fernandflores\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
 C:\Users\chinn\Documents\TALLER_DE_LENGUAJES_II\tl2-tp6-2024-fernandflores\obj\Debug\net9.0\tl2-tp6-2024-fernandflores.csproj.AssemblyReference.cache
 C:\Users\chinn\Documents\TALLER_DE_LENGUAJES_II\tl2-tp6-2024-fernandflores\obj\Debug\net9.0\tl2-tp6-.F6C84805.Up2Date
+C:\Users\chinn\Documents\TALLER_DE_LENGUAJES_II\tl2-tp6-2024-fernandflores\obj\Debug\net9.0\tl2-tp6-2024-fernandflores.sourcelink.json

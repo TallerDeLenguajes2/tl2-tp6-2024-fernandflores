@@ -1,0 +1,41 @@
+@model Presupuestos
+        
+    <h2 class="text-center">LISTADO DE DETALLES</h2>
+    <section>
+
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">            
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 justify-content-center">
+                        <li class="nav-item">
+                            <a class="btn btn-primary" asp-controller="Presupuestos" asp-action="AgregarProductoAlPresupuesto" asp-route-id=@Model.IdPresupuesto>Agregar</a> @*envia al controlador el "id"*@
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>  
+
+        <article>
+            <table class="table table-bordered bordered-info">
+                <thead class="text-center">
+                    <th>Id Prodcuto</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </thead>
+                @{
+                    foreach(var item in Model.Detalle) // envia @item.IdProducto el id a su controlador 
+                    {
+                        <tr>
+                            <td class="text-start">@item.Producto.IdProducto</td>
+                            <td class="text-center">@item.Producto.Descripcion</td>
+                            <td class="text-center">@item.Cantidad</td>
+                            <td class="text-center"><a asp-controller="Presupuestos" asp-action="ModificarDetalleForm" asp-route-idPres="@Model.IdPresupuesto" asp-route-idProd="@item.Producto.IdProducto" class="btn btn-secondary">Modificar</a></td>  
+
+                        </tr>
+                    }
+                }
+            </table>
+        </article>
+        <a asp-controller="Presupuestos" asp-action="Index" class="btn btn-primary">Volver</a>
+    </section>

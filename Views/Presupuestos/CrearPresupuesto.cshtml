@@ -1,0 +1,28 @@
+@model Presupuestos
+<section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <article class="border rounded p-5">
+        <form asp-asp-controller="Presupuestos" asp-action="CrearPresupuesto" method="post">
+            <section class="form-group p-2">
+                <label asp-for="NombreDestinatario" class="form-label">Nombre Destino:</label>
+                <input type="text" asp-for="NombreDestinatario" class="form-control-sm">
+            </section>
+            <section class="form-group d-flex justify-content-between p-2">
+                <label asp-for="FechaCreacion" class="form-label">Fecha</label>
+                <input type="date" asp-for="FechaCreacion" class="form-control-sm">
+            </section>
+            <section class="form-group d-flex justify-content-between p-2">
+                <label asp-for="Detalle[0].Producto.IdProducto" class="form-label">Id producto</label>
+                <input type="number" asp-for="Detalle[0].Producto.IdProducto" class="form-control-sm">
+            </section>
+            <section class="form-group d-flex justify-content-between p-2">
+                <label asp-for="Detalle[0].Cantidad" class="form-label">cantidad</label>
+                <input type="number" asp-for="Detalle[0].Cantidad" class="form-control-sm">
+            </section>
+            <section  class="form-group p-2">
+                <input type="submit" value="crear" class="btn btn-primary">
+                <a class="btn btn-danger " asp-controller="Productos" asp-action="Index" >volver</a>
+            </section>
+        </form>
+        @*// asp-for conecta los modelos con el formulario, es decir que automaticamente se crea el objeto*@
+    </article>
+</section>

@@ -1,0 +1,10 @@
+@model int
+<section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <article class="border rounded p-5 bg-light">
+        <p class="text-center">Confirmar eliminacion</p>
+        <section>
+            <a asp-controller="Presupuestos" asp-action="ConfirmarEliminarPresupuesto" asp-route-id=@Model class="btn btn-danger m-3">Confirmar</a>
+            <a asp-controller="Presupuestos" asp-action="Index" class="btn btn-primary m-3">Cancelar</a>
+        </section>       
+    </article>
+</section>
