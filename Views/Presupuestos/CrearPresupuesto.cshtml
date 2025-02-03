@@ -3,8 +3,8 @@
     <article class="border rounded p-5">
         <form asp-asp-controller="Presupuestos" asp-action="CrearPresupuesto" method="post">
             <section class="form-group p-2">
-                <label asp-for="NombreDestinatario" class="form-label">Nombre Destino:</label>
-                <input type="text" asp-for="NombreDestinatario" class="form-control-sm">
+                <label asp-for="Cliente.Nombre" class="form-label">Nombre Destino:</label>
+                <input type="text" asp-for="Cliente.ClienteId" class="form-control-sm">
             </section>
             <section class="form-group d-flex justify-content-between p-2">
                 <label asp-for="FechaCreacion" class="form-label">Fecha</label>
@@ -26,3 +26,7 @@
         @*// asp-for conecta los modelos con el formulario, es decir que automaticamente se crea el objeto*@
     </article>
 </section>
+@*el @model: 
+*Recibe datos: Cuando el controlador renderiza una vista, el modelo contiene los datos que se mostrarán.
+*Envía datos: Cuando el formulario se envía al servidor, el modelo puede usarse para mapear los datos enviados.
+en este caso se los enviamos al formulario (te das cuenta si en el controlador retorna la vista sola o con algo, si va vacia el model en la vista envia los datos, si retorna algo, el model recibe los datos en la vista)*@

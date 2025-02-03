@@ -15,7 +15,7 @@
         <article>
             <table class="table table-bordered bordered-info">
                 <thead class="text-center">
-                    <th>Nombre Destinatario</th>
+                    <th>CLIENTE</th>
                     <th>Fecha De Creacion</th>
                     <th colspan="3">Acciones</th>
                 </thead>
@@ -23,7 +23,7 @@
                     foreach(var item in Model) // envia @item.IdProducto el id a su controlador 
                     {
                         <tr>
-                            <td class="text-start">@item.NombreDestinatario</td>
+                            <td class="text-start">@item.Cliente.Nombre</td>
                             <td class="text-center">@item.FechaCreacion</td>
                             <td class="text-center"><a asp-controller="Presupuestos" asp-action="VerDetalle" asp-route-id="@item.IdPresupuesto" class="btn btn-info text-white">Ver</a></td> 
                             <td class="text-center"><a asp-controller="Presupuestos" asp-action="ModificarForm" asp-route-idPres="@item.IdPresupuesto" class="btn btn-secondary">Modificar</a></td>

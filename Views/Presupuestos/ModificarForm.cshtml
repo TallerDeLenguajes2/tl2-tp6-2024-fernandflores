@@ -2,10 +2,10 @@
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-asp-controller="Presupuestos" asp-action="Modificar" method="post">
-            <input type="hidden" asp-for="IdPresupuesto" value="@Model.IdPresupuesto"> @*debo enviar el id para que razon cree el objeto presupuesto completo*@
+            <input type="hidden" asp-for="IdPresupuesto" value="@Model.IdPresupuesto"> @*debo enviar el id para que razor cree el objeto presupuesto completo*@
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="NombreDestinatario" class="form-label">Nombre:</label>
-                <input type="text" asp-for="NombreDestinatario" class="form-control-sm" value="@Model.NombreDestinatario">
+                <label asp-for="Cliente.ClienteId" class="form-label">Id cliente:</label>
+                <input type="text" asp-for="Cliente.ClienteId" class="form-control-sm" value="@Model.Cliente.ClienteId">
             </section>
             <section class="form-group d-flex justify-content-between p-2">
                 <label asp-for="FechaCreacion" class="form-label">Fecha de creacion:</label>

@@ -5,7 +5,7 @@ public class PresupuestosRepository
     public void CrearPresupuesto (Presupuestos presupuesto)
     {
         string connectionString= "Data Source= Tienda.db; Cache= Shared";
-        string query= "INSERT INTO Presupuestos (NombreDestinatario, FechaCreacion) VALUES (@nombre, @fecha)";
+        string query= "INSERT INTO Presupuestos (ClienteId, FechaCreacion) VALUES (@ClteId, @fecha)";
         string query2= "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cant)";
         string query3= "SELECT MAX (idPresupuesto) FROM Presupuestos";
         using (var connection = new SqliteConnection(connectionString))
@@ -14,7 +14,7 @@ public class PresupuestosRepository
             SqliteCommand command = new SqliteCommand(query, connection);
             SqliteCommand command2= new SqliteCommand(query2, connection);
             SqliteCommand command3= new SqliteCommand(query3, connection);
-            command.Parameters.AddWithValue("@nombre", presupuesto.NombreDestinatario);
+            command.Parameters.AddWithValue("@ClteId", presupuesto.Cliente.ClienteId);
             command.Parameters.AddWithValue("@fecha", presupuesto.FechaCreacion);
             command.ExecuteNonQuery(); // guardamos el presupuesto, ahora debemos obtener el id generado por la base de datos para poder guardarlo en el detalle
             int idGuardado= Convert.ToInt32(command3.ExecuteScalar()); // funcion que nos permite ejecutar una consulta sql que devuelve un solo resultado o valor (aca por ejemplo solo nos devuelve un numero: idPresupuesto)
@@ -34,18 +34,24 @@ public class PresupuestosRepository
         string connectionString="Data Source= Tienda.db; Cache= Shared";
         string query= @"SELECT 
                             Pres.idPresupuesto, 
-                            Pres.NombreDestinatario, 
+                            Pres.ClienteId, 
                             Pres.FechaCreacion, 
                             Prod.idProducto, 
                             Prod.Descripcion, 
                             Prod.Precio, 
-                            PresDet.Cantidad  
+                            PresDet.Cantidad,  
+                            Clte.Nombre,
+                            Clte.Email,
+                            Clte.Telefono
+
                         FROM 
                             Presupuestos Pres 
                         JOIN 
                             PresupuestosDetalle PresDet ON PresDet.idPresupuesto = Pres.idPresupuesto 
                         JOIN 
                             Productos Prod ON Prod.idProducto = PresDet.idProducto
+                        JOIN 
+                            Clientes Clte ON Clte.ClienteId = Pres.ClienteId
                         ORDER BY
                             Pres.idPresupuesto";
         // FROM Presupuestos Pres --> tabla principal, se le da el alias Pres para referirnos a ella
@@ -61,20 +67,21 @@ public class PresupuestosRepository
         //    4                 fer                 12-11-24        minipimer             57000      1
         //    4                 fer                 12-11-24        licuadora             40000      1
         // idpresupuesto "1" tiene un solo detalle entonces aparece una vez pero idpresupuesto "4" tiene dos detalles entonces al hacer la combinacion de filas el select nos devuelve 2 veces el id (por eso usamos el if mas adelante)
+        // si bien en la base de datos los datos de presupuesto solo son idpres, fehca, clienteid debemos crear los objetos compleots por eso es que se hace una consulta completa
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             SqliteCommand comand = new SqliteCommand(query, connection);
             using ( SqliteDataReader reader = comand.ExecuteReader())
             {
-                int idPresupuestoAux= -1;
+                int idPresupuestoAux= -1; // para que cree una sola vez un presupuesto 
                 Presupuestos presupuesto = null;
                 while(reader.Read())
                 
                 { //si un presupuesto tiene 2 detalles no queremos que se cree 2 objetos presupuestos por eso el siguiente if
                     if(idPresupuestoAux != Convert.ToInt32(reader["idPresupuesto"]))// aseguramos que cree una sola vez el presupuesto por id
                     {
-                        presupuesto= new Presupuestos(Convert.ToInt32(reader["idPresupuesto"]),Convert.ToString(reader["NombreDestinatario"]), new List<PresupuestosDetalle>(), Convert.ToDateTime(reader["FechaCreacion"]));
+                        presupuesto= new Presupuestos(Convert.ToInt32(reader["idPresupuesto"]),new Clientes(Convert.ToInt32(reader["ClienteId"]),Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]), Convert.ToString(reader["Telefono"])), new List<PresupuestosDetalle>(), Convert.ToDateTime(reader["FechaCreacion"]));
                         listaPresupuestos.Add(presupuesto);
                     }
                     
@@ -99,18 +106,23 @@ public class PresupuestosRepository
         Presupuestos presupuesto= null;
         var query=@"SELECT 
                         p.idPresupuesto,
-                        p.NombreDestinatario,
+                        p.ClienteId,
                         p.FechaCreacion,
                         prod.idProducto,
                         prod.Descripcion,
                         prod.Precio,
-                        d.cantidad
+                        d.cantidad,
+                        Clte.Nombre,
+                        Clte.Email,
+                        Clte.Telefono
                     FROM
                         Presupuestos p
                     JOIN
                         PresupuestosDetalle d ON d.idPresupuesto = p.idPresupuesto 
                     JOIN
                         Productos prod ON prod.IdProducto = d.idProducto
+                    JOIN 
+                        Clientes Clte ON Clte.ClienteId = p.ClienteId
                     WHERE
                         p.idPresupuesto=@id";
         int idAux= -1;
@@ -125,8 +137,8 @@ public class PresupuestosRepository
                 {
                     if(idAux != Convert.ToInt32(reader["idPresupuesto"])) //creo solo un objeto presupuesto(si tiene varios detalles la consulta devuelve varios idpresupuestos (iguales) como demostre en el ejemplo de supertabla)
                     {
-                        presupuesto= new Presupuestos(Convert.ToInt32(reader["idPresupuesto"]), Convert.ToString(reader["NombreDestinatario"]), new List<PresupuestosDetalle>(), Convert.ToDateTime(reader["FechaCreacion"]));
-                        idAux= Convert.ToInt32(reader["idPresupuesto"]);
+                        presupuesto= new Presupuestos(Convert.ToInt32(reader["idPresupuesto"]),new Clientes(Convert.ToInt32(reader["ClienteId"]),Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]), Convert.ToString(reader["Telefono"])), new List<PresupuestosDetalle>(), Convert.ToDateTime(reader["FechaCreacion"]));
+                        idAux= Convert.ToInt32(reader["idPresupuesto"]);                    
                     }
                     var producto= new Productos(Convert.ToInt32(reader["idProducto"]), Convert.ToString(reader["Descripcion"]),Convert.ToInt32(reader["Precio"]));
                     var detalle= new PresupuestosDetalle(producto, Convert.ToInt32(reader["Cantidad"]));
@@ -164,9 +176,9 @@ public class PresupuestosRepository
         string query2= "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id";
         using (var connection = new SqliteConnection(connectionString))
         {
+            connection.Open();
             var command= new SqliteCommand(query, connection);
             var command2= new SqliteCommand(query2, connection);
-            connection.Open();
             command2.Parameters.AddWithValue("@id", id);
             command2.ExecuteNonQuery();
             command.Parameters.AddWithValue("@id", id);
@@ -195,14 +207,14 @@ public class PresupuestosRepository
     }
     public bool ModificarPresupuesto(Presupuestos presupuesto, int id)
     {
-        string query= "UPDATE Presupuestos SET NombreDestinatario= @nombre, FechaCreacion=@fecha WHERE idPresupuesto=@idPres";
+        string query= "UPDATE Presupuestos SET ClienteId= @ClteId, FechaCreacion=@fecha WHERE idPresupuesto=@idPres";
         string connectionString="Data Source= Tienda.db; Cache= Shared";
         using (var connection= new SqliteConnection(connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@idPres", id);
-            command.Parameters.AddWithValue("@nombre", presupuesto.NombreDestinatario);
+            command.Parameters.AddWithValue("@ClteId", presupuesto.Cliente.ClienteId);
             command.Parameters.AddWithValue("@fecha", presupuesto.FechaCreacion);
             int filas= command.ExecuteNonQuery();
             connection.Close();

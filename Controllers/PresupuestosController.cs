@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class PresupuestosController : Controller
 {
@@ -19,12 +20,20 @@ public class PresupuestosController : Controller
     [HttpGet]
     public IActionResult CrearPresupuesto()
     {
-        return View();
+        var repoClientes= new ClientesRepository();
+        var repoProducto= new ProductoRepository();
+        var clientes = repoClientes.ListarClientes();
+        var producto = repoProducto.ListarProdcutos();
+        var clientesVM= clientes.Select(c=> new ClienteViewModel(c.ClienteId, c.Nombre)).ToList();
+        var productoVM= producto.Select(p=> new ProductoViewModel(p.IdProducto, p.Descripcion)).ToList();
+        var viewmodel=  new PresupuestoAltaViewModel(clientesVM,productoVM);
+        return View(viewmodel);
     }
     [HttpPost]
-    public IActionResult CrearPresupuesto(Presupuestos presupuesto)
+    public IActionResult CrearPresupuesto(Presupuestos presupuesto) // va a dejar de recibir un presupuesto y va a recibir un viewmodel
     {
-        _repoPresupuestos.CrearPresupuesto(presupuesto);
+        // el controlador se encargara de transformar el viewmodel en el item presupuesto para que lo procese el repositorio (esto sera asi en todos los casos)
+        _repoPresupuestos.CrearPresupuesto(presupuesto); 
         return RedirectToAction("Index");
     }
     [HttpGet]
@@ -58,7 +67,7 @@ public class PresupuestosController : Controller
         _repoPresupuestos.ModificarDetalle(detalle,idPres, idProdViejo);
         return RedirectToAction("VerDetalle");
     }
-        [HttpGet]
+    [HttpGet]
     public IActionResult EliminarPresupuesto(int id)
     {
         return View(id);
