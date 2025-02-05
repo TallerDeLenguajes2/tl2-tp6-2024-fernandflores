@@ -1,22 +1,26 @@
-@model Presupuestos
+@model PresupuestoAltaViewModel
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-asp-controller="Presupuestos" asp-action="CrearPresupuesto" method="post">
             <section class="form-group p-2">
-                <label asp-for="Cliente.Nombre" class="form-label">Nombre Destino:</label>
-                <input type="text" asp-for="Cliente.ClienteId" class="form-control-sm">
+                <label asp-for="IdClienteSeleccionado" class="form-label">seleccionar cliente</label>
+                <select asp-for="IdClienteSeleccionado" asp-items="@(new SelectList(Model.Clientes,"ClienteId","Nombre"))" class="form-control-sm">
+                    <option value="">seleccione un cliente</option>
+                </select>
             </section>
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="FechaCreacion" class="form-label">Fecha</label>
-                <input type="date" asp-for="FechaCreacion" class="form-control-sm">
+                <label class="form-label">Fecha</label>
+                <input type="date" name="FechaCreacion" class="form-control-sm">
             </section>
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="Detalle[0].Producto.IdProducto" class="form-label">Id producto</label>
-                <input type="number" asp-for="Detalle[0].Producto.IdProducto" class="form-control-sm">
+                <label asp-for="IdProductoSeleccionado" class="form-label">Id producto</label>
+                <select asp-for="IdProductoSeleccionado" asp-items="@(new SelectList(Model.Productos,"IdProd","Descripcion"))" class="form-control-sm">
+                    <option value="">seleccione un producto</option>
+                </select>
             </section>
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="Detalle[0].Cantidad" class="form-label">cantidad</label>
-                <input type="number" asp-for="Detalle[0].Cantidad" class="form-control-sm">
+                <label  class="form-label">cantidad</label>
+                <input type="number" name="cantidad" class="form-control-sm">
             </section>
             <section  class="form-group p-2">
                 <input type="submit" value="crear" class="btn btn-primary">

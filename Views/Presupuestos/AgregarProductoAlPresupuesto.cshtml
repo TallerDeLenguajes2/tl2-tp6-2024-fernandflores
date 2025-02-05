@@ -1,25 +1,39 @@
-@model int 
+@model ProductoAltaPresupuestoViewModel
+@if(Model.Productos.Count>=1)
+{
 
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-asp-controller="Presupuestos" asp-action="AgregarProductoAlPresupuesto" method="post">
-            <input type="hidden"  name="idPres" value="@Model">
+            <input type="hidden" asp-for="IdPresupuesto" value="@Model.IdPresupuesto">
             <section class="form-group d-flex justify-content-between p-2">
-                <label class="form-label">Id producto a agregar</label>
-                <input type="number" name="idProd" class="form-control-sm">
+                <label class="form-label">Prodcuto:</label>
+                <select asp-for="IdProductoSeleccionado" asp-items="@(new SelectList(Model.Productos, "IdProducto", "NombreProducto"))" class="form-control-sm">
+                    <option value="">seleccione un producto</option>
+                </select>
             </section>
             <section class="form-group d-flex justify-content-between p-2">
                 <label  class="form-label">cantidad</label>
-                <input type="number" name="cant" class="form-control-sm">
+                <input type="number" name="cantidad" class="form-control-sm">
             </section>
             <section  class="form-group p-2">
                 <input type="submit" value="crear" class="btn btn-primary">
-                <a class="btn btn-danger " asp-controller="Presupuestos" asp-action="VerDetalle" >volver</a>
+                <a class="btn btn-danger " asp-controller="Presupuestos" asp-route-id="@Model.IdPresupuesto" asp-action="VerDetalle" >volver</a>
             </section>
         </form>
 @* input envia al controlador los datos de los parametros a traves del name del imput *@
     </article>
 </section>
+}
+else
+{  
+   <script>
+    alert("No hay productos disponibles que se puedan agregar. Aceptar para redirigir")
+        setTimeout(function () {
+            window.history.back();
+        }, 500); @*este codigo redirige a la pagina anterior luego de 2.5 seg*@
+    </script>
+}
 @*el @model: 
 *Recibe datos: Cuando el controlador renderiza una vista, el modelo contiene los datos que se mostrarán.
 *Envía datos: Cuando el formulario se envía al servidor, el modelo puede usarse para mapear los datos enviados.

@@ -1,20 +1,34 @@
 public class PresupuestoAltaViewModel
 {
-    public DateTime fecha;
-    public List<ClienteViewModel> clientes;
-    public List<ProductoViewModel> productos;
+
+    private List<ClienteViewModel> _clientes;
+    private List<ProductoViewModel> _productos;
+    private int _idClienteSeleccionado;
+    private int _idProductoSeleccionado;
+
+    public PresupuestoAltaViewModel()
+    {
+    }
 
     public PresupuestoAltaViewModel(List<ClienteViewModel> cltes, List<ProductoViewModel> prodtos)
     {
-        this.fecha= (DateTime.Now).Date;
-        clientes=cltes;
-        productos= prodtos;
+        
+        _clientes=cltes;
+        _productos= prodtos;
     }
+
+    public List<ProductoViewModel> Productos { get => _productos; set => _productos = value; }
+    public List<ClienteViewModel> Clientes { get => _clientes; set => _clientes = value; }
+    public int IdClienteSeleccionado { get => _idClienteSeleccionado; set => _idClienteSeleccionado = value; }
+    public int IdProductoSeleccionado { get => _idProductoSeleccionado; set => _idProductoSeleccionado = value; }
 }
 public class ClienteViewModel
 {
-    public int clienteId;
-    public string nombre;
+    private int _clienteId;
+    private string _nombre;
+
+    public int ClienteId { get => _clienteId; set => _clienteId = value; }
+    public string Nombre { get => _nombre; set => _nombre = value; }
 
     public ClienteViewModel()
     {
@@ -22,18 +36,21 @@ public class ClienteViewModel
 
     public ClienteViewModel(int id, string nombre)
     {
-        clienteId=id;
-        this.nombre=nombre;
+        ClienteId=id;
+        this.Nombre=nombre;
     }
 }
 public class ProductoViewModel
 {
-    public int idProd;
-    public string descripcion;
+    private int _idProd;
+    private string _descripcion;
+
+    public int IdProd { get => _idProd; set => _idProd = value; }
+    public string Descripcion { get => _descripcion; set => _descripcion = value; }
 
     public ProductoViewModel(int id, string descrip)
     {
-        idProd= id;
-        descripcion= descrip;
+        IdProd= id;
+        Descripcion= descrip;
     }
 }

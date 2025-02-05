@@ -9,6 +9,7 @@ public class PresupuestosController : Controller
     {
         _logger = logger;
         _repoPresupuestos= new PresupuestosRepository();
+       
 
     }
     [HttpGet]
@@ -30,8 +31,17 @@ public class PresupuestosController : Controller
         return View(viewmodel);
     }
     [HttpPost]
-    public IActionResult CrearPresupuesto(Presupuestos presupuesto) // va a dejar de recibir un presupuesto y va a recibir un viewmodel
+    public IActionResult CrearPresupuesto(PresupuestoAltaViewModel presupuestoVM, DateTime FechaCreacion, int cantidad ) // va a dejar de recibir un presupuesto y va a recibir un viewmodel
     {
+        var _repoClientes= new ClientesRepository();
+        var _repoProd= new ProductoRepository();
+        var cliente= _repoClientes.ObtenerClientePorId(presupuestoVM.IdClienteSeleccionado);
+        var prod= _repoProd.ObtenerProductoPorId(presupuestoVM.IdProductoSeleccionado);
+        var listaProd= new List<PresupuestosDetalle>
+        {
+            new PresupuestosDetalle(prod, cantidad)
+        };
+        var presupuesto= new Presupuestos(0,cliente, listaProd, FechaCreacion);
         // el controlador se encargara de transformar el viewmodel en el item presupuesto para que lo procese el repositorio (esto sera asi en todos los casos)
         _repoPresupuestos.CrearPresupuesto(presupuesto); 
         return RedirectToAction("Index");
@@ -81,12 +91,18 @@ public class PresupuestosController : Controller
    [HttpGet]
    public IActionResult AgregarProductoAlPresupuesto(int id)
    {
-    return View(id);
+    var _repoProductos= new ProductoRepository();
+    var presu=_repoPresupuestos.ObtenerPresupuestoPorId(id);
+    var listadoProductos= _repoProductos.ListarProdcutos();
+    var listadoProductosVM= listadoProductos.Where(p=> !presu.Detalle.Any(a=> a.Producto.IdProducto==p.IdProducto)).Select(s=> new ListadoProductosAltaPresupuestoViewModel(s.IdProducto, s.Descripcion)).ToList(); // where para filtrar: donde en presu.detalle no haya ningun a.prod.id (a del any) igual al p.idprod (p del where) si no se cumple la igualdad selecciono el s.nombre y s.id (s del select) creando un objeto listadoproductoaltaviewmodel y agregandolo a la lista  
+    var viewmodel= new ProductoAltaPresupuestoViewModel(id, listadoProductosVM);
+    return View(viewmodel);
    }
    [HttpPost]
-   public IActionResult AgregarProductoAlPresupuesto(int idPres, int cant, int idProd)
+   public IActionResult AgregarProductoAlPresupuesto(ProductoAltaPresupuestoViewModel viewmodel, int cantidad)
    {
-    _repoPresupuestos.AgregarProductoyCantidad(idPres,idProd,cant);
+
+    _repoPresupuestos.AgregarProductoyCantidad(viewmodel.IdPresupuesto,viewmodel.IdProductoSeleccionado, cantidad);
     return RedirectToAction("Index");
    }
 }

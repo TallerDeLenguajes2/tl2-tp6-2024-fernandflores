@@ -187,7 +187,7 @@ public class PresupuestosRepository
 
             return true;
         }
-    }
+    } 
     public bool ModificarDetalle(PresupuestosDetalle detalle, int idPres ,int idProdViejo)
     {
         string query="UPDATE PresupuestosDetalle SET idProducto=@idProdNuevo, Cantidad=@cant WHERE idPresupuesto=@idPres AND idProducto=@idProd";
