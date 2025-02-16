@@ -2,13 +2,24 @@ using Microsoft.Data.Sqlite;
 using SQLitePCL;
 public class PresupuestosRepository:IPresupuestosRepository
 {
+    private readonly ILogger _logger;
+    private readonly string _connectionString;
+
+    public PresupuestosRepository(string CadenaDeConexion)
+    {
+        _connectionString= CadenaDeConexion;
+    }
+
+    public PresupuestosRepository()
+    {
+    }
+
     public void CrearPresupuesto (Presupuestos presupuesto)
     {
-        string connectionString= "Data Source= Tienda.db; Cache= Shared";
         string query= "INSERT INTO Presupuestos (ClienteId, FechaCreacion) VALUES (@ClteId, @fecha)";
         string query2= "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cant)";
         string query3= "SELECT MAX (idPresupuesto) FROM Presupuestos";
-        using (var connection = new SqliteConnection(connectionString))
+        using (var connection = new SqliteConnection(_connectionString))
         {
             connection.Open();
             SqliteCommand command = new SqliteCommand(query, connection);
@@ -31,7 +42,6 @@ public class PresupuestosRepository:IPresupuestosRepository
     public List<Presupuestos> ListarPresupuestos()
     {
         var listaPresupuestos= new List<Presupuestos>();
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
         string query= @"SELECT 
                             Pres.idPresupuesto, 
                             Pres.ClienteId, 
@@ -68,7 +78,7 @@ public class PresupuestosRepository:IPresupuestosRepository
         //    4                 fer                 12-11-24        licuadora             40000      1
         // idpresupuesto "1" tiene un solo detalle entonces aparece una vez pero idpresupuesto "4" tiene dos detalles entonces al hacer la combinacion de filas el select nos devuelve 2 veces el id (por eso usamos el if mas adelante)
         // si bien en la base de datos los datos de presupuesto solo son idpres, fehca, clienteid debemos crear los objetos compleots por eso es que se hace una consulta completa
-        using (var connection = new SqliteConnection(connectionString))
+        using (var connection = new SqliteConnection(_connectionString))
         {
             connection.Open();
             SqliteCommand comand = new SqliteCommand(query, connection);
@@ -102,7 +112,6 @@ public class PresupuestosRepository:IPresupuestosRepository
     }
     public Presupuestos ObtenerPresupuestoPorId (int id)
     {
-        var connectionString ="Data Source= Tienda.db; Cache=Shared";
         Presupuestos presupuesto= null;
         var query=@"SELECT 
                         p.idPresupuesto,
@@ -126,7 +135,7 @@ public class PresupuestosRepository:IPresupuestosRepository
                     WHERE
                         p.idPresupuesto=@id";
         int idAux= -1;
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             SqliteCommand command= new SqliteCommand(query, connection);
@@ -154,9 +163,8 @@ public class PresupuestosRepository:IPresupuestosRepository
     {  
         ProductoRepository repoProd= new ProductoRepository();
         if(ObtenerPresupuestoPorId(idPres)==null || repoProd.ObtenerProductoPorId(idProd)==null) return false;
-        string connectionString= "Data Source= Tienda.db; Cache= Shared";
         string query= "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cant)";
-        using (SqliteConnection connection= new SqliteConnection(connectionString))
+        using (SqliteConnection connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             SqliteCommand command = new SqliteCommand(query, connection);
@@ -171,10 +179,9 @@ public class PresupuestosRepository:IPresupuestosRepository
     public bool EliminarPresupuesto (int id)
     {
         if (ObtenerPresupuestoPorId(id)==null)return false;
-        string connectionString= "Data Source= Tienda.db; Cache= Shared";
         string query="DELETE FROM Presupuestos WHERE idPresupuesto=@id";
         string query2= "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id";
-        using (var connection = new SqliteConnection(connectionString))
+        using (var connection = new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
@@ -191,8 +198,7 @@ public class PresupuestosRepository:IPresupuestosRepository
     public bool ModificarDetalle(PresupuestosDetalle detalle, int idPres ,int idProdViejo)
     {
         string query="UPDATE PresupuestosDetalle SET idProducto=@idProdNuevo, Cantidad=@cant WHERE idPresupuesto=@idPres AND idProducto=@idProd";
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query,connection);
@@ -208,8 +214,7 @@ public class PresupuestosRepository:IPresupuestosRepository
     public bool ModificarPresupuesto(Presupuestos presupuesto, int id)
     {
         string query= "UPDATE Presupuestos SET ClienteId= @ClteId, FechaCreacion=@fecha WHERE idPresupuesto=@idPres";
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);

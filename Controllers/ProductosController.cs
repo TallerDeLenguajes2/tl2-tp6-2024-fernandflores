@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 public class ProductosController : Controller 
 {
     private readonly ILogger<ProductosController> _logger;
-    private ProductoRepository _repositorioProducto;
+    private IProductoRepository _repositorioProducto;
 
-    public ProductosController(ILogger<ProductosController> logger)
+    public ProductosController(ILogger<ProductosController> logger, IProductoRepository ProductoRepository)
     {
         _logger = logger;
-        _repositorioProducto= new ProductoRepository();
+        _repositorioProducto= ProductoRepository;
     }
     [HttpGet]
     public IActionResult Index()

@@ -2,11 +2,18 @@ using Microsoft.Data.Sqlite;
 
 public class ClientesRepository:IClienteRepository
 {
+    private readonly ILogger<ClientesRepository> _logger;
+    private readonly string _connectionString;
+
+    public ClientesRepository(string CadenaDeConexion)
+    {
+        _connectionString= CadenaDeConexion;
+    }
+
     public void CrearCliente(Clientes cliente) 
     {
-        string connectionString= "Data Source= Tienda.db; Cache= Shared";
         string query="INSERT INTO Clientes (Nombre, Email, Telefono) VALUES (@nombre, @email, @tel)";
-        using (var connection= new SqliteConnection(connectionString))
+        using (SqliteConnection connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
@@ -20,9 +27,8 @@ public class ClientesRepository:IClienteRepository
     public List<Clientes> ListarClientes()
     {
         var lista= new List<Clientes>();
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
         string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes";
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
@@ -41,9 +47,8 @@ public class ClientesRepository:IClienteRepository
     public Clientes ObtenerClientePorId (int id)
     {
         Clientes cliente= null;
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
         string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes WHERE ClienteId=@id";
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
@@ -62,9 +67,8 @@ public class ClientesRepository:IClienteRepository
     }
     public void ModificarCliente(Clientes cliente)
     {
-        string connectionString="Data Source= Tienda.db; Cache= Shared";
         string query= "UPDATE Clientes SET Nombre=@nombre, Email= @email, Telefono=@tel WHERE ClienteId=@id";
-        using(var connection= new SqliteConnection(connectionString))
+        using(var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);
@@ -79,10 +83,9 @@ public class ClientesRepository:IClienteRepository
     public void EliminarCliente(int id)
     {
         var repoPresupuesto= new PresupuestosRepository();
-        string connectionString = "Data Source= Tienda.db; Cache= Shared";
         string query= "DELETE FROM Clientes WHERE ClienteId = @id";
         string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @id";
-        using (var connection= new SqliteConnection(connectionString))
+        using (var connection= new SqliteConnection(_connectionString))
         {
             connection.Open();
             var command= new SqliteCommand(query, connection);

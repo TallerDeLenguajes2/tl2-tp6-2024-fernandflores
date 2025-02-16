@@ -5,15 +5,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 public class PresupuestosController : Controller
 {
     private readonly ILogger<PresupuestosController> _logger;
-    private PresupuestosRepository _repoPresupuestos;
-    private ClientesRepository _repoClientes;
-    private ProductoRepository _repoProductos ;
-    public PresupuestosController(ILogger<PresupuestosController> logger)
+    private IPresupuestosRepository _repoPresupuestos;
+    private IClienteRepository _repoClientes;
+    private IProductoRepository _repoProductos ;
+    public PresupuestosController(ILogger<PresupuestosController> logger, IPresupuestosRepository RepoPresupuesto, IClienteRepository RepoCliente, IProductoRepository RepoProducto)
     {
         _logger = logger;
-        _repoPresupuestos= new PresupuestosRepository();
-        _repoClientes= new ClientesRepository();
-        _repoProductos= new ProductoRepository();
+        _repoPresupuestos= RepoPresupuesto;
+        _repoClientes= RepoCliente;
+        _repoProductos= RepoProducto;
     }
     [HttpGet]
     public IActionResult Index()

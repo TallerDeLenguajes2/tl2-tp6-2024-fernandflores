@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 public class ClientesController : Controller 
 {
-     private readonly ILogger<ClientesController> _logger;
-    private ClientesRepository _repoClientes;
-    public ClientesController(ILogger<ClientesController> logger)
+    private readonly ILogger<ClientesController> _logger;
+    private IClienteRepository _repoClientes;
+    public ClientesController(ILogger<ClientesController> logger, IClienteRepository ClienteRepository)
     {
         _logger = logger;
-        _repoClientes= new ClientesRepository();
+        _repoClientes= ClienteRepository;
     }
     [HttpGet]
     public IActionResult Index()

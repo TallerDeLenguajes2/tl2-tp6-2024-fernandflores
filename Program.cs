@@ -1,5 +1,10 @@
 var builder = WebApplication.CreateBuilder(args);
-
+// inyeccion de dependencias:
+builder.Services.AddSingleton<IClienteRepository, ClientesRepository>(); 
+builder.Services.AddSingleton<IProductoRepository, ProductoRepository>();
+builder.Services.AddSingleton<IPresupuestosRepository, PresupuestosRepository>();
+var CadenaDeConexion= builder.Configuration.GetConnectionString("SqliteConexion")!.ToString(); //definido en appsetting.json
+builder.Services.AddSingleton(CadenaDeConexion);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<inMemoryUserRepository>();
