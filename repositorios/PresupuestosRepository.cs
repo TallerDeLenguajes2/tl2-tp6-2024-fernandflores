@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 using SQLitePCL;
-public class PresupuestosRepository
+public class PresupuestosRepository:IPresupuestosRepository
 {
     public void CrearPresupuesto (Presupuestos presupuesto)
     {

@@ -1,8 +1,8 @@
 using Microsoft.Data.Sqlite;
 
-public class ClientesRepository
+public class ClientesRepository:IClienteRepository
 {
-    public void CrearCliente(Clientes cliente)
+    public void CrearCliente(Clientes cliente) 
     {
         string connectionString= "Data Source= Tienda.db; Cache= Shared";
         string query="INSERT INTO Clientes (Nombre, Email, Telefono) VALUES (@nombre, @email, @tel)";

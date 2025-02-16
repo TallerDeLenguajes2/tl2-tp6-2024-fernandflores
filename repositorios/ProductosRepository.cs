@@ -2,7 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Data.Sqlite;
 using SQLitePCL;
-public class ProductoRepository
+public class ProductoRepository:IProductoRepository
 {
     public void CrearProducto (Productos producto)
     {
