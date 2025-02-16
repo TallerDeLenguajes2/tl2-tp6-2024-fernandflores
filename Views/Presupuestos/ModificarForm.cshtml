@@ -1,20 +1,25 @@
-@model Presupuestos
+@model ModificarPresupuestoViewModel
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-asp-controller="Presupuestos" asp-action="Modificar" method="post">
-            <input type="hidden" asp-for="IdPresupuesto" value="@Model.IdPresupuesto"> @*debo enviar el id para que razor cree el objeto presupuesto completo*@
+            <input type="hidden" asp-for="IdPresupuesto" >
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="Cliente.ClienteId" class="form-label">Id cliente:</label>
-                <input type="text" asp-for="Cliente.ClienteId" class="form-control-sm" value="@Model.Cliente.ClienteId">
+                <label class="form-label">Cliente:</label>
+                <select asp-for="IdClienteSeleccionado" asp-items="@(new SelectList(Model.Clientes, "ClienteId", "Nombre"))" class="form-control-sm">
+                  
+                </select>
             </section>
+                <span asp-validation-for="IdClienteSeleccionado" class="text-danger"></span>
             <section class="form-group d-flex justify-content-between p-2">
-                <label asp-for="FechaCreacion" class="form-label">Fecha de creacion:</label>
-                <input type="date" asp-for="FechaCreacion" class="form-control-sm" value="@Model.FechaCreacion">
+                <label asp-for="Fecha" class="form-label">Fecha de creacion:</label>
+                <input type="date" asp-for="Fecha" class="form-control-sm">
             </section>
+                <span asp-validation-for="Fecha" class="text-danger"></span>
             <section  class="form-group p-2">
                 <input type="submit" value="modificar" class="btn btn-primary">
-                <a class="btn btn-danger " asp-controller="Productos" asp-action="Index" >volver</a>
+                <a class="btn btn-danger " asp-controller="Presupuestos" asp-action="Index" >volver</a>
             </section>
         </form>
     </article>
 </section>
+@section Scripts{<partial name="_ValidationScriptsPartial"/>}

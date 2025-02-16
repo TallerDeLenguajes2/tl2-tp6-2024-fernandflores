@@ -6,14 +6,17 @@
                 <label asp-for="Nombre" class="form-label">Nombre cliente:</label>
                 <input type="text" asp-for="Nombre" class="form-control-sm">
             </section>
+            <span asp-validation-for="Nombre" class="text-danger"></span>
             <section class="form-group p-2">
                 <label asp-for="Email" class="form-label">Email:</label>
                 <input type="email" asp-for="Email" class="form-control-sm">
             </section>         
+            <span asp-validation-for="Email" class="text-danger"></span>
             <section class="form-group p-2">
                 <label asp-for="Telefono" class="form-label">Telefono:</label>
                 <input type="text" asp-for="Telefono" class="form-control-sm">
             </section>
+            <span asp-validation-for="Telefono" class="text-danger"></span>
             <section  class="form-group p-2">
                 <input type="submit" value="crear" class="btn btn-primary">
                 <a class="btn btn-danger " asp-controller="Clientes" asp-action="Index">volver</a>
@@ -21,6 +24,7 @@
         </form>
     </article>
 </section>
+@section Scripts{<partial name="_ValidationScriptsPartial"/>}
 @*el @model: 
 *Recibe datos: Cuando el controlador renderiza una vista, el modelo contiene los datos que se mostrarán.
 *Envía datos: Cuando el formulario se envía al servidor, el modelo puede usarse para mapear los datos enviados.*@

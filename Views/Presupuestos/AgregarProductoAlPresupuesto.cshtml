@@ -1,4 +1,4 @@
-@model ProductoAltaPresupuestoViewModel
+@model AgregarProductoAlPresupuestoViewModel
 @if(Model.Productos.Count>=1)
 {
 
@@ -8,14 +8,16 @@
             <input type="hidden" asp-for="IdPresupuesto" value="@Model.IdPresupuesto">
             <section class="form-group d-flex justify-content-between p-2">
                 <label class="form-label">Prodcuto:</label>
-                <select asp-for="IdProductoSeleccionado" asp-items="@(new SelectList(Model.Productos, "IdProducto", "NombreProducto"))" class="form-control-sm">
+                <select asp-for="IdProductoSeleccionado" asp-items="@(new SelectList(Model.Productos, "IdProducto", "Descripcion"))" class="form-control-sm">
                     <option value="">seleccione un producto</option>
                 </select>
             </section>
+                <span asp-validation-for="IdProductoSeleccionado" class="text-danger"></span>
             <section class="form-group d-flex justify-content-between p-2">
-                <label  class="form-label">cantidad</label>
-                <input type="number" name="cantidad" class="form-control-sm">
+                <label  asp-for="Cantidad" class="form-label">cantidad</label>
+                <input asp-for="Cantidad" type="number" class="form-control-sm">
             </section>
+            <span asp-validation-for="Cantidad" class="text-danger"></span>
             <section  class="form-group p-2">
                 <input type="submit" value="crear" class="btn btn-primary">
                 <a class="btn btn-danger " asp-controller="Presupuestos" asp-route-id="@Model.IdPresupuesto" asp-action="VerDetalle" >volver</a>
@@ -34,6 +36,7 @@ else
         }, 500); @*este codigo redirige a la pagina anterior luego de 2.5 seg*@
     </script>
 }
+@section Scripts{<partial name="_ValidationScriptsPartial"/>}
 @*el @model: 
 *Recibe datos: Cuando el controlador renderiza una vista, el modelo contiene los datos que se mostrarán.
 *Envía datos: Cuando el formulario se envía al servidor, el modelo puede usarse para mapear los datos enviados.

@@ -6,14 +6,17 @@
                 <label asp-for="Nombre" class="form-label">Nombre cliente:</label>
                 <input type="text" asp-for="Nombre" class="form-control-sm" value="@Model.Nombre">
             </section>
+            <span asp-validation-for="Nombre" class="text-danger"></span>
             <section class="form-group p-2">
                 <label asp-for="Email" class="form-label ">Email:</label>
                 <input type="email" asp-for="Email" class="form-control-sm" value="@Model.Email">
             </section>         
+            <span asp-validation-for="Email" class="text-danger"></span>
             <section class="form-group p-2">
                 <label asp-for="Telefono" class="form-label">Telefono:</label>
                 <input type="text" asp-for="Telefono" class="form-control-sm" value="@Model.Telefono">
             </section>
+            <span asp-validation-for="Telefono" class="text-danger"></span>
             <input type="hidden" asp-for="ClienteId" value="@Model.ClienteId">
             <section  class="form-group p-2">
                 <input type="submit" value="Modificar" class="btn btn-primary">
@@ -22,4 +25,5 @@
         </form>
     </article>
 </section>
+@section Scripts{<partial name="_ValidationScriptsPartial"/>}
 
