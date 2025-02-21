@@ -1,4 +1,12 @@
 @model List<Clientes>
+    @if(TempData["RolError"] !=null) // si no es admin al querer hacer alguna accion crear, modificar elimianr redirecciona al index y muestra el error 
+    {
+        <section class="alert alert-danger" role="alert">
+            <p>@TempData["RolError"]</p>
+        </section>
+    }
+    @if(ViewBag.Rol=="admin")
+    {
              <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">            
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -10,6 +18,7 @@
                 </div>
             </div>
         </nav>
+    }
     <h2 class="text-center">LISTADO DE CLIENTES</h2>
     <section>
         <article>
@@ -18,7 +27,10 @@
                     <th>nombre</th>
                     <th>email</th>
                     <th>telefono</th>
-                    <th colspan="3">Acciones</th>
+                    @if(ViewBag.Rol=="admin")
+                    {
+                        <th colspan="3">Acciones</th>
+                    }
                 </thead>
                 @{
                     foreach(var item in Model) // envia @item.IdProducto el id a su controlador 
@@ -27,8 +39,11 @@
                             <td class="text-center">@item.Nombre</td>
                             <td class="text-center">@item.Email</td>
                             <td class="text-center">@item.Telefono</td>
-                            <td class="text-center"><a asp-controller="Clientes" asp-action="ModificarClienteForm" asp-route-id="@item.ClienteId" class="btn btn-secondary">Modificar</a></td>
-                            <td><a asp-controller="Clientes" asp-action="EliminarCliente" asp-route-id="@item.ClienteId" class="btn btn-danger">Eliminar</a></td>
+                            @if(ViewBag.Rol=="admin")
+                            {
+                                <td class="text-center"><a asp-controller="Clientes" asp-action="ModificarClienteForm" asp-route-id="@item.ClienteId" class="btn btn-secondary">Modificar</a></td>
+                                <td><a asp-controller="Clientes" asp-action="EliminarCliente" asp-route-id="@item.ClienteId" class="btn btn-danger">Eliminar</a></td>
+                            }
                         </tr>
                     }
                 }

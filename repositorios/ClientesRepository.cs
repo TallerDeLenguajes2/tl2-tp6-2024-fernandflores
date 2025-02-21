@@ -12,6 +12,7 @@ public class ClientesRepository:IClienteRepository
 
     public void CrearCliente(Clientes cliente) 
     {
+        
         string query="INSERT INTO Clientes (Nombre, Email, Telefono) VALUES (@nombre, @email, @tel)";
         using (SqliteConnection connection= new SqliteConnection(_connectionString))
         {

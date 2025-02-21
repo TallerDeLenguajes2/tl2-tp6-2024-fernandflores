@@ -28,7 +28,7 @@
 <section class="d-flex justify-content-center align-items-center" style="height: 70vh;">
     <article class="border rounded p-5">
         <form asp-controller="Presupuestos" asp-action="ModificarDetalle" method="post">
-            <input type="hidden" asp-for="IdPresupuesto">
+            <input type="hidden" asp-for="IdPresupuesto"> @*debe enviarse asi para que razor cree el objeto *@
             <input type="hidden" asp-for="IdProdAnterior"> 
             <section class="form-group d-flex justify-content-between p-2">
                 <label class="form-label">Prodcuto:</label>

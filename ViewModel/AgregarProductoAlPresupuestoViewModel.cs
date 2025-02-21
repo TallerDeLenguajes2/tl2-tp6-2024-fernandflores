@@ -8,7 +8,7 @@ public class AgregarProductoAlPresupuestoViewModel
 
     public AgregarProductoAlPresupuestoViewModel()
     {
-        _productos= new List<ProductoViewModel>();
+        _productos= new List<ProductoViewModel>(); 
     }
 
     public AgregarProductoAlPresupuestoViewModel(int id, List<ProductoViewModel> lista)

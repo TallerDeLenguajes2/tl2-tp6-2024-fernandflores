@@ -10,7 +10,7 @@ public class PresupuestoAltaViewModel
     private int _cantidad;
     public PresupuestoAltaViewModel()
     {
-        _clientes= new List<ClienteViewModel>();
+        _clientes= new List<ClienteViewModel>(); // se envian para que no haya problemas con razor al enviar el formulario al controlador
         _productos= new List<ProductoViewModel>();
     }
 

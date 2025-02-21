@@ -1,36 +1,58 @@
 @model LoginViewModel  
 
-@{
-    ViewData["Title"] = "Login";
-}
-
-<h2 class="text-center">@ViewData["Title"]</h2>
-
-<!-- Mostrar mensaje de error si existe -->
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))  @*si ingreso datos incorrectos apareceran como alerta (se retorna de nuevo a esta vista con el viewmodel es por eso que se tiene esta info)*@
 {
     <div class="alert alert-danger" role="alert">
         @Model.ErrorMessage
     </div>
 }
-
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
-        <h4 class="card-title text-center mb-4">Iniciar sesión</h4>
-        <form method="post" asp-action="Login">
-            <div class="mb-3">
-                <label for="username" class="form-label">Usuario:</label>
-                <input type="text" class="form-control" id="username" name="username" value="@Model.Username" required />
+@if (Model.IsAuthenticated)
+{
+    <span class="nav-link text-dark">Bienvenido <strong>@Model.UserName</strong></span>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container-fluid">            
+            <div class="navbar-collapse collapse d-flex flex-column align-items-center">
+                <ul class="navbar-nav d-flex flex-column w-100 align-items-center">
+                    <li class="nav-item mb-3 w-500">
+                        
+                        <a class="btn btn-danger w-100" asp-controller="Login" asp-action="Logout">Cerrar sesion</a>
+                    </li>
+                    <li class="nav-item w-50">
+                        @if(ViewBag.Rol=="admin")
+                        {
+                        <a class="btn btn-primary w-100" asp-controller="Login" asp-action="CrearUsuario">REGISTRAR USUARIO</a>
+                        }
+                    </li>
+                </ul>
             </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña:</label>
-                <input type="password" class="form-control" id="password" name="password" required />
-            </div>
-
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-            </div>
-        </form>
-    </div>
-</div>
+        </div>
+    </nav> 
+}
+else
+{
+                  
+    <section class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <section class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+            <h4 class="card-title text-center mb-4">Iniciar sesión</h4>
+            <form method="post" asp-controller="Login" asp-action="Login">
+                <section class="form-group p-3">
+                    <label asp-for="UserName" class="form-label">Usuario:</label>
+                    <input type="text" class="form-control" asp-for="UserName" required />
+                </section>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+                <section class="form-group p-3">
+                    <label asp-for="Password" class="form-label">Contraseña:</label>
+                    <input asp-for="Password" type="password" class="form-control" required />
+                </section>
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <section class="form-group p-3">
+                    <input type="submit" class="btn btn-primary" value="Iniciar sesion">
+                    <a class="btn btn-danger " asp-controller="Login" asp-action="Index">volver</a>
+                </section>
+                <section class="form-group p-3">
+                </section>
+            </form>
+        </section>
+    </section>
+@section Scripts{<partial name="_ValidationScriptsPartial"/>}
+}
