@@ -12,91 +12,130 @@ public class ClientesRepository:IClienteRepository
 
     public void CrearCliente(Clientes cliente) 
     {
-        
-        string query="INSERT INTO Clientes (Nombre, Email, Telefono) VALUES (@nombre, @email, @tel)";
-        using (SqliteConnection connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            var command= new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("@nombre", cliente.Nombre);
-            command.Parameters.AddWithValue("@email", cliente.Email);
-            command.Parameters.AddWithValue("@tel", cliente.Telefono);
-            command.ExecuteNonQuery();
-            connection.Close();
+            string query="INSERT INTO Clientes (Nombre, Email, Telefono) VALUES (@nombre, @email, @tel)";
+            using (SqliteConnection connection= new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                command.Parameters.AddWithValue("@email", cliente.Email);
+                command.Parameters.AddWithValue("@tel", cliente.Telefono);
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
     public List<Clientes> ListarClientes()
     {
-        var lista= new List<Clientes>();
-        string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes";
-        using (var connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            var command= new SqliteCommand(query, connection);
-            using (SqliteDataReader reader = command.ExecuteReader())
+            var lista= new List<Clientes>();
+            string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes";
+            using (var connection= new SqliteConnection(_connectionString))
             {
-                
-                while (reader.Read())
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                using (SqliteDataReader reader = command.ExecuteReader())
                 {
-                    lista.Add(new Clientes(Convert.ToInt32(reader["ClienteId"]), Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]),Convert.ToString(reader["Telefono"])));
+                    
+                    while (reader.Read())
+                    {
+                        lista.Add(new Clientes(Convert.ToInt32(reader["ClienteId"]), Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]),Convert.ToString(reader["Telefono"])));
+                    }
                 }
+                connection.Close();
             }
-            connection.Close();
+            return lista;
         }
-        return lista;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
+        }
     }
     public Clientes ObtenerClientePorId (int id)
     {
-        Clientes cliente= null;
-        string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes WHERE ClienteId=@id";
-        using (var connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            var command= new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("@id", id);
-            using (SqliteDataReader reader = command.ExecuteReader())
+            Clientes cliente= null;
+            string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes WHERE ClienteId=@id";
+            using (var connection= new SqliteConnection(_connectionString))
             {
-                
-                if (reader.Read())
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@id", id);
+                using (SqliteDataReader reader = command.ExecuteReader())
                 {
-                    cliente=new Clientes(Convert.ToInt32(reader["ClienteId"]), Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]),Convert.ToString(reader["Telefono"]));
+                    
+                    if (reader.Read())
+                    {
+                        cliente=new Clientes(Convert.ToInt32(reader["ClienteId"]), Convert.ToString(reader["Nombre"]), Convert.ToString(reader["Email"]),Convert.ToString(reader["Telefono"]));
+                    }
                 }
+                connection.Close();
             }
-            connection.Close();
+            return cliente;
         }
-        return cliente;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
+        }
     }
     public void ModificarCliente(Clientes cliente)
     {
-        string query= "UPDATE Clientes SET Nombre=@nombre, Email= @email, Telefono=@tel WHERE ClienteId=@id";
-        using(var connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            var command= new SqliteCommand(query, connection);
-            command.Parameters.AddWithValue("@id", cliente.ClienteId);
-            command.Parameters.AddWithValue("@nombre", cliente.Nombre);
-            command.Parameters.AddWithValue("@email", cliente.Email);
-            command.Parameters.AddWithValue("@tel", cliente.Telefono);
-            command.ExecuteNonQuery();
-            connection.Close();
+            string query= "UPDATE Clientes SET Nombre=@nombre, Email= @email, Telefono=@tel WHERE ClienteId=@id";
+            using(var connection= new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@id", cliente.ClienteId);
+                command.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                command.Parameters.AddWithValue("@email", cliente.Email);
+                command.Parameters.AddWithValue("@tel", cliente.Telefono);
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
     public void EliminarCliente(int id)
     {
-        var repoPresupuesto= new PresupuestosRepository();
-        string query= "DELETE FROM Clientes WHERE ClienteId = @id";
-        string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @id";
-        using (var connection= new SqliteConnection(_connectionString))
+        try
+        {    
+            var repoPresupuesto= new PresupuestosRepository();
+            string query= "DELETE FROM Clientes WHERE ClienteId = @id";
+            string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @id";
+            using (var connection= new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                var command2= new SqliteCommand(query2, connection);
+                command2.Parameters.AddWithValue("@id", id); // asocio el id al query2
+                int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
+                repoPresupuesto.EliminarPresupuesto(idPres); // elimino el presupuesto del cliente
+                command.Parameters.AddWithValue("@id", id); // asocio el id al query
+                command.ExecuteNonQuery(); // ejecuto la consulta query
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
         {
-            connection.Open();
-            var command= new SqliteCommand(query, connection);
-            var command2= new SqliteCommand(query2, connection);
-            command2.Parameters.AddWithValue("@id", id); // asocio el id al query2
-            int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
-            repoPresupuesto.EliminarPresupuesto(idPres); // elimino el presupuesto del cliente
-            command.Parameters.AddWithValue("@id", id); // asocio el id al query
-            command.ExecuteNonQuery(); // ejecuto la consulta query
-            connection.Close();
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
 }

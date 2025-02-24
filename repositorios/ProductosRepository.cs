@@ -18,92 +18,132 @@ public class ProductoRepository:IProductoRepository
 
     public void CrearProducto (Productos producto)
     {
-        string queryString= "INSERT INTO Productos (Descripcion, Precio) VALUES (@descripcion, @precio)"; // consulta sql
-        using (SqliteConnection conexion= new SqliteConnection(_connectionString)) // objeto connection sirve para conectar(hacemos la conexion)
+        try
         {
-            conexion.Open(); //abrimos la conexion gracias al objeto connection
-            SqliteCommand comando= new SqliteCommand (queryString, conexion); // clase comando, permite hacer las consultas(recibe como referencia una consulta sql y la conexion)
-            comando.Parameters.AddWithValue("@descripcion", producto.Descripcion);
-            comando.Parameters.AddWithValue("@precio", producto.Precio); // agregamos los parametros gracias a la clase comand
-            comando.ExecuteNonQuery(); // ejectua inset update y delete
-            conexion.Close(); //cerramos la conexion con el objeto connection
+            string queryString= "INSERT INTO Productos (Descripcion, Precio) VALUES (@descripcion, @precio)"; // consulta sql
+            using (SqliteConnection conexion= new SqliteConnection(_connectionString)) // objeto connection sirve para conectar(hacemos la conexion)
+            {
+                conexion.Open(); //abrimos la conexion gracias al objeto connection
+                SqliteCommand comando= new SqliteCommand (queryString, conexion); // clase comando, permite hacer las consultas(recibe como referencia una consulta sql y la conexion)
+                comando.Parameters.AddWithValue("@descripcion", producto.Descripcion);
+                comando.Parameters.AddWithValue("@precio", producto.Precio); // agregamos los parametros gracias a la clase comand
+                comando.ExecuteNonQuery(); // ejectua inset update y delete
+                conexion.Close(); //cerramos la conexion con el objeto connection
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
     public void ModificarProducto (int id, Productos producto)
     {
-        string queryString= "UPDATE Productos SET Descripcion= @descripcion, Precio= @precio WHERE idProducto=@id";
-        using (SqliteConnection connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            SqliteCommand command = new SqliteCommand (queryString, connection);
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@descripcion", producto.Descripcion);
-            command.Parameters.AddWithValue("@precio", producto.Precio);
-            command.ExecuteNonQuery();
-            connection.Close();
+            string queryString= "UPDATE Productos SET Descripcion= @descripcion, Precio= @precio WHERE idProducto=@id";
+            using (SqliteConnection connection= new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                SqliteCommand command = new SqliteCommand (queryString, connection);
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@descripcion", producto.Descripcion);
+                command.Parameters.AddWithValue("@precio", producto.Precio);
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
     public List<Productos> ListarProdcutos()
     {
-        var productos= new List<Productos>();
-        string queryString= "SELECT idProducto, Descripcion, Precio FROM Productos";
-        using (SqliteConnection connection = new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            SqliteCommand command = new SqliteCommand (queryString, connection);
-            using (SqliteDataReader reader= command.ExecuteReader()) //uso de la clase DataReader que permite leer datos
+            var productos= new List<Productos>();
+            string queryString= "SELECT idProducto, Descripcion, Precio FROM Productos";
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                while (reader.Read()) //recorremos la tabla sql gracias a la clase DataReader
+                connection.Open();
+                SqliteCommand command = new SqliteCommand (queryString, connection);
+                using (SqliteDataReader reader= command.ExecuteReader()) //uso de la clase DataReader que permite leer datos
                 {
-                    var productoAux= new Productos();
-                    productoAux.IdProducto= Convert.ToInt32(reader["idProducto"]); // reader[""]permite obtener la lectura de ese elemento especifico de la tabla
-                    productoAux.Precio= Convert.ToInt32(reader["Precio"]);
-                  //  productoAux.Descripcion= reader["Descripcion"].ToString(); es lo mismo solo que en caso de ser null devuelve una exepcion
-                    productoAux.Descripcion= Convert.ToString(reader["Descripcion"]); // en caso de ser null devuelve vacio " "
-                    productos.Add(productoAux);                    
+                    while (reader.Read()) //recorremos la tabla sql gracias a la clase DataReader
+                    {
+                        var productoAux= new Productos();
+                        productoAux.IdProducto= Convert.ToInt32(reader["idProducto"]); // reader[""]permite obtener la lectura de ese elemento especifico de la tabla
+                        productoAux.Precio= Convert.ToInt32(reader["Precio"]);
+                    //  productoAux.Descripcion= reader["Descripcion"].ToString(); es lo mismo solo que en caso de ser null devuelve una exepcion
+                        productoAux.Descripcion= Convert.ToString(reader["Descripcion"]); // en caso de ser null devuelve vacio " "
+                        productos.Add(productoAux);                    
+                    }
                 }
+                connection.Close();
             }
-            connection.Close();
+            return productos;
         }
-        return productos;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
+        }
     }
     public Productos ObtenerProductoPorId(int id)
     {
-        Productos producto= null;
-        string query= "SELECT Precio, Descripcion FROM Productos WHERE idProducto= @id";
-        using (SqliteConnection connection = new SqliteConnection(_connectionString))
+        try
         {
-            SqliteCommand command = new SqliteCommand(query, connection);
-            connection.Open();
-            command.Parameters.AddWithValue("@id", id);
-            using (SqliteDataReader reader= command.ExecuteReader())
+            Productos producto= null;
+            string query= "SELECT Precio, Descripcion FROM Productos WHERE idProducto= @id";
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-               if (reader.Read())
+                SqliteCommand command = new SqliteCommand(query, connection);
+                connection.Open();
+                command.Parameters.AddWithValue("@id", id);
+                using (SqliteDataReader reader= command.ExecuteReader())
                 {
-                    producto= new Productos();
-                    producto.IdProducto= id;
-                    producto.Descripcion= Convert.ToString(reader["Descripcion"]);
-                    producto.Precio= Convert.ToInt32(reader["Precio"]);
+                if (reader.Read())
+                    {
+                        producto= new Productos();
+                        producto.IdProducto= id;
+                        producto.Descripcion= Convert.ToString(reader["Descripcion"]);
+                        producto.Precio= Convert.ToInt32(reader["Precio"]);
+                    }
                 }
+                connection.Close();
             }
-            connection.Close();
+            return producto;
         }
-        return producto;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
+        }
     }
     public void EliminarPorId (int id)
     {
-        string query= "DELETE FROM Productos WHERE idProducto=@id";
-        string query2="DELETE FROM PresupuestosDetalle WHERE idProducto=@id";
-        using (SqliteConnection connection= new SqliteConnection(_connectionString))
+        try
         {
-            connection.Open();
-            SqliteCommand command= new SqliteCommand(query, connection);
-            SqliteCommand command2= new SqliteCommand(query2, connection);
-            command2.Parameters.AddWithValue("@id",id);
-            command.Parameters.AddWithValue("@id", id);
-            command2.ExecuteNonQuery();
-            command.ExecuteNonQuery();
-            connection.Close();
+            string query= "DELETE FROM Productos WHERE idProducto=@id";
+            string query2="DELETE FROM PresupuestosDetalle WHERE idProducto=@id";
+            using (SqliteConnection connection= new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                SqliteCommand command= new SqliteCommand(query, connection);
+                SqliteCommand command2= new SqliteCommand(query2, connection);
+                command2.Parameters.AddWithValue("@id",id);
+                command.Parameters.AddWithValue("@id", id);
+                command2.ExecuteNonQuery();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception();
         }
     }
 }

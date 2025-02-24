@@ -46,7 +46,7 @@ public class ClientesController : Controller
     public IActionResult ModificarClienteForm (int id)
     {
         if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login"); // revisar si esta logeado
-        if(HttpContext.Session.GetString("rol")!="admin")
+        if(HttpContext.Session.GetString("rol")!="admin") //revisa si es admin
         {
             TempData["RolError"]="no tenes los privilegios para hacer esta accion";
             return RedirectToAction("Index"); // como es redirectoaction un viewbag no serivria, asi que lo mandamos con tempdata
@@ -58,7 +58,7 @@ public class ClientesController : Controller
     public IActionResult ModificarCliente (Clientes cliente)
     {
         if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login"); // revisar si esta logeado
-        if(HttpContext.Session.GetString("rol")!="admin")
+        if(HttpContext.Session.GetString("rol")!="admin") //revisa si es admin
         {
             TempData["RolError"]="no tenes los privilegios para hacer esta accion";
             return RedirectToAction("Index"); // como es redirectoaction un viewbag no serivria, asi que lo mandamos con tempdata

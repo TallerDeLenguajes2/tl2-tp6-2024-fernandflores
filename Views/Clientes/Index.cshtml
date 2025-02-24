@@ -1,5 +1,5 @@
 @model List<Clientes>
-    @if(TempData["RolError"] !=null) // si no es admin al querer hacer alguna accion crear, modificar elimianr redirecciona al index y muestra el error 
+    @if(TempData["RolError"] !=null) // si no es admin al querer hacer alguna accion crear, modificar elimianr redirecciona al index y muestra el error, como se lo redirecciona al index cuando sucede el error de no ser admin, lo mostramos al error aca
     {
         <section class="alert alert-danger" role="alert">
             <p>@TempData["RolError"]</p>
