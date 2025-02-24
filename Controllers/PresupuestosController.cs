@@ -18,88 +18,142 @@ public class PresupuestosController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login"); // si no hay nadie logeado, lo manda al logearse
-        ViewBag.Rol=HttpContext.Session.GetString("rol"); // enviamos en un viewbag el rol a la vista (viewbag sirve para enviar datos del controlador a la misma vista, no para redirecttoactions)
-        var lista=_repoPresupuestos.ListarPresupuestos();
-        return View(lista);
+        try
+        {
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login"); // si no hay nadie logeado, lo manda al logearse
+            ViewBag.Rol=HttpContext.Session.GetString("rol"); // enviamos en un viewbag el rol a la vista (viewbag sirve para enviar datos del controlador a la misma vista, no para redirecttoactions)
+            var lista=_repoPresupuestos.ListarPresupuestos();
+            return View(lista);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar la pagina de inicio de presupuestos";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet]
     public IActionResult CrearPresupuesto()
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            var clientes = _repoClientes.ListarClientes();
+            var producto = _repoProductos.ListarProdcutos();
+            var clientesVM= clientes.Select(c=> new ClienteViewModel(c.ClienteId, c.Nombre)).ToList();
+            var productoVM= producto.Select(p=> new ProductoViewModel(p.IdProducto, p.Descripcion)).ToList();
+            var viewmodel=  new PresupuestoAltaViewModel(clientesVM,productoVM);
+            return View(viewmodel);
         }
-        var clientes = _repoClientes.ListarClientes();
-        var producto = _repoProductos.ListarProdcutos();
-        var clientesVM= clientes.Select(c=> new ClienteViewModel(c.ClienteId, c.Nombre)).ToList();
-        var productoVM= producto.Select(p=> new ProductoViewModel(p.IdProducto, p.Descripcion)).ToList();
-        var viewmodel=  new PresupuestoAltaViewModel(clientesVM,productoVM);
-        return View(viewmodel);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar el formulario de crear presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpPost]
     public IActionResult CrearPresupuesto(PresupuestoAltaViewModel presupuestoVM) // va a dejar de recibir un presupuesto y va a recibir un viewmodel
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            if(!ModelState.IsValid) return RedirectToAction ("Index");
+            var cliente= _repoClientes.ObtenerClientePorId(presupuestoVM.IdClienteSeleccionado);
+            var prod= _repoProductos.ObtenerProductoPorId(presupuestoVM.IdProductoSeleccionado);
+            var listaProd= new List<PresupuestosDetalle>
+            {
+                new PresupuestosDetalle(prod, presupuestoVM.Cantidad)
+            };
+            var presupuesto= new Presupuestos(0,cliente, listaProd, presupuestoVM.Fecha);
+            // el controlador se encargara de transformar el viewmodel en el item presupuesto para que lo procese el repositorio (esto sera asi en todos los casos)
+            _repoPresupuestos.CrearPresupuesto(presupuesto); 
             return RedirectToAction("Index");
         }
-        if(!ModelState.IsValid) return RedirectToAction ("Index");
-        var cliente= _repoClientes.ObtenerClientePorId(presupuestoVM.IdClienteSeleccionado);
-        var prod= _repoProductos.ObtenerProductoPorId(presupuestoVM.IdProductoSeleccionado);
-        var listaProd= new List<PresupuestosDetalle>
+        catch (Exception ex)
         {
-            new PresupuestosDetalle(prod, presupuestoVM.Cantidad)
-        };
-        var presupuesto= new Presupuestos(0,cliente, listaProd, presupuestoVM.Fecha);
-        // el controlador se encargara de transformar el viewmodel en el item presupuesto para que lo procese el repositorio (esto sera asi en todos los casos)
-        _repoPresupuestos.CrearPresupuesto(presupuesto); 
-        return RedirectToAction("Index");
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo crear el presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet]
     public IActionResult VerDetalle(int id)
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        ViewBag.Rol= HttpContext.Session.GetString("rol");
-        var presupuesto=_repoPresupuestos.ObtenerPresupuestoPorId(id);
-        return View(presupuesto);
+        try
+        {
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            ViewBag.Rol= HttpContext.Session.GetString("rol");
+            var presupuesto=_repoPresupuestos.ObtenerPresupuestoPorId(id);
+            return View(presupuesto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar la vista de detalles";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet]
     public IActionResult ModificarForm(int idPres)
     {   
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
-        }
-        var presupuesto= _repoPresupuestos.ObtenerPresupuestoPorId(idPres); 
-        var clientes=_repoClientes.ListarClientes();
-        var ClientesVM= clientes.Select(c=> new ClienteViewModel(c.ClienteId,c.Nombre)).ToList();
-        var viewmodel= new ModificarPresupuestoViewModel(idPres, ClientesVM, presupuesto.FechaCreacion, presupuesto.Cliente.ClienteId);
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            var presupuesto= _repoPresupuestos.ObtenerPresupuestoPorId(idPres); 
+            var clientes=_repoClientes.ListarClientes();
+            var ClientesVM= clientes.Select(c=> new ClienteViewModel(c.ClienteId,c.Nombre)).ToList();
+            var viewmodel= new ModificarPresupuestoViewModel(idPres, ClientesVM, presupuesto.FechaCreacion, presupuesto.Cliente.ClienteId);
 
-        
-        return View(viewmodel);
+            
+            return View(viewmodel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar el formulario de modificar el presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpPost]
     public IActionResult Modificar(ModificarPresupuestoViewModel viewModel)
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            if(!ModelState.IsValid) return RedirectToAction ("Index");
+            var cliente= _repoClientes.ObtenerClientePorId(viewModel.IdClienteSeleccionado);
+            var detalle= _repoPresupuestos.ObtenerPresupuestoPorId(viewModel.IdPresupuesto);
+            var presupuesto= new Presupuestos(0,cliente,detalle.Detalle,viewModel.Fecha);
+            _repoPresupuestos.ModificarPresupuesto(presupuesto, viewModel.IdPresupuesto);
             return RedirectToAction("Index");
         }
-        if(!ModelState.IsValid) return RedirectToAction ("Index");
-        var cliente= _repoClientes.ObtenerClientePorId(viewModel.IdClienteSeleccionado);
-        var detalle= _repoPresupuestos.ObtenerPresupuestoPorId(viewModel.IdPresupuesto);
-        var presupuesto= new Presupuestos(0,cliente,detalle.Detalle,viewModel.Fecha);
-        _repoPresupuestos.ModificarPresupuesto(presupuesto, viewModel.IdPresupuesto);
-        return RedirectToAction("Index");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo modificar el presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet]
     public IActionResult ModificarDetalleForm(int idProd, int idPres)
@@ -108,19 +162,28 @@ public class PresupuestosController : Controller
         //var detalle=presupuesto.Detalle.Find(d=>d.Producto.IdProducto==idProd);
         //ViewData["idPres"]=idPres; // eniva a la vista la informacion en @ViewData["idPres"]
         //return View(detalle);     lo guarde para ver el uso del viewdata
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            var presupuesto=_repoPresupuestos.ObtenerPresupuestoPorId(idPres);
+            var listaProductos= _repoProductos.ListarProdcutos();
+            var listadoProductosVM= listaProductos.Where(w=> !presupuesto.Detalle.Any(a=> a.Producto.IdProducto==w.IdProducto)).Select(s=> new ProductoViewModel(s.IdProducto,s.Descripcion)).ToList(); // listo todos los productos que no esten en el presupuesto
+            var detalle=presupuesto.Detalle.Find(d=>d.Producto.IdProducto==idProd);
+            listadoProductosVM.Add(new ProductoViewModel(detalle.Producto.IdProducto, detalle.Producto.Descripcion)); // como al crear la lista ignore todos los productos que el presupuesto tenia, incluyo ahora el que estaba seleccionado (por si solo se quisiera modificar la cantidad, sin esto no se podria ya que me obligaria tambien a cambiar de producto)
+            var viewmodel= new ModificarDetalleViewModel(listadoProductosVM, detalle.Cantidad, detalle.Producto.IdProducto, idPres, idProd);
+            return View(viewmodel);  
         }
-        var presupuesto=_repoPresupuestos.ObtenerPresupuestoPorId(idPres);
-        var listaProductos= _repoProductos.ListarProdcutos();
-        var listadoProductosVM= listaProductos.Where(w=> !presupuesto.Detalle.Any(a=> a.Producto.IdProducto==w.IdProducto)).Select(s=> new ProductoViewModel(s.IdProducto,s.Descripcion)).ToList(); // listo todos los productos que no esten en el presupuesto
-        var detalle=presupuesto.Detalle.Find(d=>d.Producto.IdProducto==idProd);
-        listadoProductosVM.Add(new ProductoViewModel(detalle.Producto.IdProducto, detalle.Producto.Descripcion)); // como al crear la lista ignore todos los productos que el presupuesto tenia, incluyo ahora el que estaba seleccionado (por si solo se quisiera modificar la cantidad, sin esto no se podria ya que me obligaria tambien a cambiar de producto)
-        var viewmodel= new ModificarDetalleViewModel(listadoProductosVM, detalle.Cantidad, detalle.Producto.IdProducto, idPres, idProd);
-        return View(viewmodel);  
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar el formulario de modificar el detalle del presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     // public IActionResult ModificarDetalle(PresupuestosDetalle detalle, int idPres, int idProdViejo)
     // {
@@ -129,69 +192,114 @@ public class PresupuestosController : Controller
     // }
     public IActionResult ModificarDetalle (ModificarDetalleViewModel viewmodel)
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            if(!ModelState.IsValid) return RedirectToAction("VerDetalle", new {id= viewmodel.IdPresupuesto});
+            var presupuesto= _repoPresupuestos.ObtenerPresupuestoPorId(viewmodel.IdPresupuesto);
+            var detalle= presupuesto.Detalle.Find(f=> f.Producto.IdProducto==viewmodel.IdProdAnterior);
+            detalle.Producto= _repoProductos.ObtenerProductoPorId(viewmodel.IdProductoSeleccionado);
+            detalle.Cantidad=viewmodel.Cantidad;
+            _repoPresupuestos.ModificarDetalle(detalle,viewmodel.IdPresupuesto,viewmodel.IdProdAnterior);
+            return RedirectToAction("VerDetalle", new { id=viewmodel.IdPresupuesto});
         }
-        if(!ModelState.IsValid) return RedirectToAction("VerDetalle", new {id= viewmodel.IdPresupuesto});
-        var presupuesto= _repoPresupuestos.ObtenerPresupuestoPorId(viewmodel.IdPresupuesto);
-        var detalle= presupuesto.Detalle.Find(f=> f.Producto.IdProducto==viewmodel.IdProdAnterior);
-        detalle.Producto= _repoProductos.ObtenerProductoPorId(viewmodel.IdProductoSeleccionado);
-        detalle.Cantidad=viewmodel.Cantidad;
-        _repoPresupuestos.ModificarDetalle(detalle,viewmodel.IdPresupuesto,viewmodel.IdProdAnterior);
-        return RedirectToAction("VerDetalle", new { id=viewmodel.IdPresupuesto});
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo modificar el detalle del presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet]
     public IActionResult EliminarPresupuesto(int id)
     {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            return View(id);
         }
-        return View(id);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar la vista de eliminar el presupuesto";
+            return RedirectToAction ("Index");
+        }
     }
     [HttpGet] //get porque mostramos la lista del index
    public IActionResult ConfirmarEliminarPresupuesto(int id)
    {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            _repoPresupuestos.EliminarPresupuesto(id);
             return RedirectToAction("Index");
         }
-        _repoPresupuestos.EliminarPresupuesto(id);
-        return RedirectToAction("Index");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo eliminar el presupuesto";
+            return RedirectToAction ("Index");
+        }
    }
    [HttpGet]
    public IActionResult AgregarProductoAlPresupuesto(int id)
    {
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
-            return RedirectToAction("Index");
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            var presu=_repoPresupuestos.ObtenerPresupuestoPorId(id);
+            var listadoProductos= _repoProductos.ListarProdcutos();
+            var listadoProductosVM= listadoProductos.Where(p=> !presu.Detalle.Any(a=> a.Producto.IdProducto==p.IdProducto)).Select(s=> new ProductoViewModel(s.IdProducto, s.Descripcion)).ToList(); // where para filtrar: donde en presu.detalle no haya ningun a.prod.id (a del any) igual al p.idprod (p del where) si no se cumple la igualdad selecciono el s.nombre y s.id (s del select) creando un objeto listadoproductoaltaviewmodel y agregandolo a la lista  
+            var viewmodel= new AgregarProductoAlPresupuestoViewModel(id, listadoProductosVM);
+            return View(viewmodel);
         }
-        var presu=_repoPresupuestos.ObtenerPresupuestoPorId(id);
-        var listadoProductos= _repoProductos.ListarProdcutos();
-        var listadoProductosVM= listadoProductos.Where(p=> !presu.Detalle.Any(a=> a.Producto.IdProducto==p.IdProducto)).Select(s=> new ProductoViewModel(s.IdProducto, s.Descripcion)).ToList(); // where para filtrar: donde en presu.detalle no haya ningun a.prod.id (a del any) igual al p.idprod (p del where) si no se cumple la igualdad selecciono el s.nombre y s.id (s del select) creando un objeto listadoproductoaltaviewmodel y agregandolo a la lista  
-        var viewmodel= new AgregarProductoAlPresupuestoViewModel(id, listadoProductosVM);
-        return View(viewmodel);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo cargar el formulario de agregar producto al presupuesto";
+            return RedirectToAction ("Index");
+        }
    }
    [HttpPost]
    public IActionResult AgregarProductoAlPresupuesto(AgregarProductoAlPresupuestoViewModel viewmodel)
    {    
-        if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
-        if(HttpContext.Session.GetString("rol")!="admin")
+        try
         {
-            TempData["RolError"]="no tenes permiso para esta accion";
+            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
+            if(HttpContext.Session.GetString("rol")!="admin")
+            {
+                TempData["RolError"]="no tenes permiso para esta accion";
+                return RedirectToAction("Index");
+            }
+            if(!ModelState.IsValid)return RedirectToAction("VerDetalle", new {id= viewmodel.IdPresupuesto});
+            _repoPresupuestos.AgregarProductoyCantidad(viewmodel.IdPresupuesto,viewmodel.IdProductoSeleccionado, viewmodel.Cantidad);
             return RedirectToAction("Index");
         }
-        if(!ModelState.IsValid)return RedirectToAction("VerDetalle", new {id= viewmodel.IdPresupuesto});
-        _repoPresupuestos.AgregarProductoyCantidad(viewmodel.IdPresupuesto,viewmodel.IdProductoSeleccionado, viewmodel.Cantidad);
-        return RedirectToAction("Index");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            TempData["MensajeCatch"]= "no se pudo agregar producto al presupuesto";
+            return RedirectToAction ("Index");
+        }
    }
 }

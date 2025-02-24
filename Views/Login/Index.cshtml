@@ -1,5 +1,10 @@
 @model LoginViewModel  
-
+@if(TempData["MensajeCatch"] !=null) // si entra al catch, se muestra el error, solo pongo esto en el index ya que es a donde redirige el catch
+{
+    <section class="error-message">
+        <p>@TempData["MensajeCatch"]</p>
+    </section>
+}
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))  @*si ingreso datos incorrectos apareceran como alerta (se retorna de nuevo a esta vista con el viewmodel es por eso que se tiene esta info)*@
 {
     <div class="alert alert-danger" role="alert">

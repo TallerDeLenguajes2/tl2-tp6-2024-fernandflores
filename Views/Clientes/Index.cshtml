@@ -1,4 +1,10 @@
 @model List<Clientes>
+     @if(TempData["MensajeCatch"] !=null) // si entra al catch, se muestra el error, solo pongo esto en el index ya que es a donde redirige el catch
+    {
+        <section class="error-message">
+            <p>@TempData["MensajeCatch"]</p>
+        </section>
+    }
     @if(TempData["RolError"] !=null) // si no es admin al querer hacer alguna accion crear, modificar elimianr redirecciona al index y muestra el error, como se lo redirecciona al index cuando sucede el error de no ser admin, lo mostramos al error aca
     {
         <section class="alert alert-danger" role="alert">
