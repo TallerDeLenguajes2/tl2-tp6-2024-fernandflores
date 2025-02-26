@@ -241,9 +241,9 @@ public class PresupuestosRepository:IPresupuestosRepository
         {
            // if(ObtenerPresupuestoPorId(idPres)==null) return false; puede tener varios presupuestos asi se los sacamos
             List<int> idPresupuestosDelCliente= new List<int>();
-            string query="DELETE FROM Presupuestos WHERE ClienteId=@idClte";
+            string query="DELETE FROM Presupuestos WHERE ClienteId=@idClte"; // elimina todos los presupuestso que sean de un cliente, en el otro metodo solo elimina un presupuesto 
             string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @idClte";
-            string query3= "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id";
+            string query3= "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id"; 
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
@@ -252,19 +252,19 @@ public class PresupuestosRepository:IPresupuestosRepository
                 command2.Parameters.AddWithValue("@idClte", idCliente);
                 using (SqliteDataReader reader = command2.ExecuteReader())
                 {
-                    while (reader.Read())
+                    while (reader.Read()) //obtenemos una lista con todos los id presupuestos pertenecientes al cliente
                     {
                         idPresupuestosDelCliente.Add(Convert.ToInt32(reader["idPresupuesto"]));
                     }
                 }
-                foreach (var idPres in idPresupuestosDelCliente)
+                foreach (var idPres in idPresupuestosDelCliente) // borramos los detalles de cada presu del cliente
                 {
                     var command3= new SqliteCommand(query3, connection); // si lo pongo por fuera da error (command no puede reasignar valores, entonces nos aseguramos de que se limpie creando una instancia nueva en el foreach)
                     command3.Parameters.AddWithValue("@id", idPres); // elimina detalles desl presupupuesto
                     command3.ExecuteNonQuery();
                     
                 }
-                command.Parameters.AddWithValue("@idClte", idCliente);
+                command.Parameters.AddWithValue("@idClte", idCliente); 
                 command.ExecuteNonQuery();
                 connection.Close();
 

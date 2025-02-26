@@ -125,7 +125,8 @@ public class ClientesRepository:IClienteRepository
                 var command= new SqliteCommand(query, connection);
                 var command2= new SqliteCommand(query2, connection);
                 command2.Parameters.AddWithValue("@id", id); // asocio el id al query2
-             //   int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
+                //int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
+                //repoPresupuesto.EliminarPresupuesto(idPres); no lo usamos porque solo borra uno, si el cliente tiene varios presupuestos no sirve
                 repoPresupuesto.EliminarPresupuestoPorCliente(id); // elimino el presupuesto del cliente
                 command.Parameters.AddWithValue("@id", id); // asocio el id al query
                 command.ExecuteNonQuery(); // ejecuto la consulta query
