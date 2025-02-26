@@ -107,7 +107,7 @@ public class LoginController : Controller
                 _repoUser.CrearUsuario(usuario);
                 return RedirectToAction("Index"); 
             }
-            ModelState.AddModelError("Usuario", "Este usuario ya existe");
+            ModelState.AddModelError("Usuario", "Este usuario ya existe"); //se mostrara en el formulario, se lo envia al asp-validation-for
             return View("CrearUsuario", viewmodel); // envio de nuevo a la vista pero con el viewmodel cosa de no perder los datos
         }
         catch (Exception ex)

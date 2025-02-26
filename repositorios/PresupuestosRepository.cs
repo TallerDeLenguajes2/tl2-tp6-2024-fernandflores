@@ -151,7 +151,7 @@ public class PresupuestosRepository:IPresupuestosRepository
                         JOIN 
                             Clientes Clte ON Clte.ClienteId = p.ClienteId
                         WHERE
-                            p.idPresupuesto=@id";
+                            p.idPresupuesto= @id";
             int idAux= -1;
             using (var connection= new SqliteConnection(_connectionString))
             {
@@ -187,7 +187,7 @@ public class PresupuestosRepository:IPresupuestosRepository
     {  
         try
         {
-            ProductoRepository repoProd= new ProductoRepository();
+            ProductoRepository repoProd= new ProductoRepository(_connectionString);
             if(ObtenerPresupuestoPorId(idPres)==null || repoProd.ObtenerProductoPorId(idProd)==null) return false;
             string query= "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cant)";
             using (SqliteConnection connection= new SqliteConnection(_connectionString))
@@ -235,6 +235,48 @@ public class PresupuestosRepository:IPresupuestosRepository
             throw new Exception();
         }
     } 
+    public bool EliminarPresupuestoPorCliente(int idCliente)
+    {
+        try
+        {
+           // if(ObtenerPresupuestoPorId(idPres)==null) return false; puede tener varios presupuestos asi se los sacamos
+            List<int> idPresupuestosDelCliente= new List<int>();
+            string query="DELETE FROM Presupuestos WHERE ClienteId=@idClte";
+            string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @idClte";
+            string query3= "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id";
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                var command= new SqliteCommand(query, connection);
+                var command2= new SqliteCommand(query2, connection);
+                command2.Parameters.AddWithValue("@idClte", idCliente);
+                using (SqliteDataReader reader = command2.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        idPresupuestosDelCliente.Add(Convert.ToInt32(reader["idPresupuesto"]));
+                    }
+                }
+                foreach (var idPres in idPresupuestosDelCliente)
+                {
+                    var command3= new SqliteCommand(query3, connection); // si lo pongo por fuera da error (command no puede reasignar valores, entonces nos aseguramos de que se limpie creando una instancia nueva en el foreach)
+                    command3.Parameters.AddWithValue("@id", idPres); // elimina detalles desl presupupuesto
+                    command3.ExecuteNonQuery();
+                    
+                }
+                command.Parameters.AddWithValue("@idClte", idCliente);
+                command.ExecuteNonQuery();
+                connection.Close();
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new Exception("error al eliminar presupuesto por cliente");
+        }
+    }
     public bool ModificarDetalle(PresupuestosDetalle detalle, int idPres ,int idProdViejo)
     {
         try

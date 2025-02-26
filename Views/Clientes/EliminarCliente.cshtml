@@ -5,7 +5,7 @@
         <p class="text-center">Confirmar eliminacion?</p>
     </article>
     <section>
-        <a asp-controller="Clientes" asp-action="ConfirmarEliminarCliente" class="btn btn-danger">Confirmar</a>
+        <a asp-controller="Clientes" asp-action="ConfirmarEliminarCliente" asp-route-id=@Model class="btn btn-danger">Confirmar</a>
         <a asp-controller="Clientes" asp-action="Index" class="btn btn-primary">Cancelar</a>
     </section>
 </section>

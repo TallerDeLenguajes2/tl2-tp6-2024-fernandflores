@@ -36,7 +36,7 @@ public class ClientesRepository:IClienteRepository
     {
         try
         {
-            var lista= new List<Clientes>();
+            var lista= new List<Clientes>(); // en los listar no inicializamos en null ya que si es null en la vista daria error (en el controlador a la vista se le envia la lista que sale de aca )
             string query = "SELECT ClienteId, Nombre, Email, Telefono FROM Clientes";
             using (var connection= new SqliteConnection(_connectionString))
             {
@@ -57,7 +57,7 @@ public class ClientesRepository:IClienteRepository
         catch (Exception ex)
         {
             _logger.LogError(ex.ToString());
-            throw new Exception();
+            throw new Exception("error al listar clientes");
         }
     }
     public Clientes ObtenerClientePorId (int id)
@@ -116,7 +116,7 @@ public class ClientesRepository:IClienteRepository
     {
         try
         {    
-            var repoPresupuesto= new PresupuestosRepository();
+            var repoPresupuesto= new PresupuestosRepository(_connectionString);
             string query= "DELETE FROM Clientes WHERE ClienteId = @id";
             string query2= "SELECT idPresupuesto FROM Presupuestos WHERE ClienteId= @id";
             using (var connection= new SqliteConnection(_connectionString))
@@ -125,8 +125,8 @@ public class ClientesRepository:IClienteRepository
                 var command= new SqliteCommand(query, connection);
                 var command2= new SqliteCommand(query2, connection);
                 command2.Parameters.AddWithValue("@id", id); // asocio el id al query2
-                int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
-                repoPresupuesto.EliminarPresupuesto(idPres); // elimino el presupuesto del cliente
+             //   int idPres= Convert.ToInt32(command2.ExecuteScalar()); // obtengo el idpresupuesto buscado en el query2 (execute escalar nos permite ejecutar una consulta que devuelve un solo valor)
+                repoPresupuesto.EliminarPresupuestoPorCliente(id); // elimino el presupuesto del cliente
                 command.Parameters.AddWithValue("@id", id); // asocio el id al query
                 command.ExecuteNonQuery(); // ejecuto la consulta query
                 connection.Close();
